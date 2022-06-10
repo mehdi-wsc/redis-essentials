@@ -1,0 +1,41 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+  name: redis
+  labels:
+    app: redis
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+
+    spec:
+      volumes:
+        - name: redis-1
+          emptyDir: {}
+      containers:
+        - name: redis
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/redis-lab/redis@sha256:803ec2b3b74c0f95758bf680d7caa370fa8d3b6058b4d57d6485d06d8027a588
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: redis-1
+              mountPath: /data
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
